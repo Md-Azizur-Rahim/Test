@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Coffee Shop Management System - Customer dashboard">
+    <title>Customer Dashboard | Coffee Corner</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- ============ HEADER ============ -->
+    <header class="header">
+        <a href="index.html" class="logo">Coffee<span>Corner</span></a>
+        <div class="user-info">
+            <span id="whoAmI">Customer</span>
+            <a href="index.html" class="btn btn-small btn-light">Home</a>
+            <a href="index.html" class="btn btn-small" onclick="return logout('index.html')">Logout</a>
+        </div>
+    </header>
+    <!-- ============ NAVIGATION ============ -->
+    <nav class="topnav">
+        <a href="#top" class="active">Dashboard</a>
+        <a href="#builder">Build Coffee</a>
+        <a href="#history">My Orders</a>
+        <a href="#favorites">Favorites</a>
+        <a href="#token">Order Token</a>
+        <a href="#review">Review</a>
+    </nav>
+    <!-- ============ HERO ============ -->
+    <div class="hero" id="top">
+        <h1>Welcome to Your Coffee Dashboard</h1>
+        <p>Customize your coffee, manage favorites and track your orders.</p>
+    </div>
+    <main class="container">
+        <!-- ============ CUSTOMER OVERVIEW ============ -->
+        <div class="feature-strip">
+            <div class="feature"><span class="feature-icon">01</span>
+                <h3>Build Coffee</h3>
+                <p>Choose size, milk type and sugar level.</p>
+            </div>
+            <div class="feature"><span class="feature-icon">02</span>
+                <h3>Favorites</h3>
+                <p>Keep your preferred coffee items in one place.</p>
+            </div>
+            <div class="feature"><span class="feature-icon">03</span>
+                <h3>Order Token</h3>
+                <p>Check your token and estimated waiting time.</p>
+            </div>
+            <div class="feature"><span class="feature-icon">04</span>
+                <h3>Order History</h3>
+                <p>Review, edit, cancel and search your orders.</p>
+            </div>
+        </div>
+
+        <!-- ============ CUSTOM COFFEE BUILDER (Create an order) ============ -->
+        <section id="builder" class="home-section">
+            <div class="section-heading">
+                <h2>Custom Coffee Builder</h2>
+                <p>Create your coffee, add it to the cart, then place the order.</p>
+            </div>
+            <div id="orderMessage" class="message" role="alert"></div>
+            <div class="row">
+                <div class="col card">
+                    <h3>Build a coffee</h3>
+                    <form action="#" method="post" novalidate onsubmit="return addToCart()">
+                        <div class="form-grid">
+                            <div class="form-group"><label for="coffee">Coffee Item</label>
+                                <select id="coffee" name="coffee" onchange="previewPrice()"></select>
+                                <span class="error" id="coffeeError"></span>
+                            </div>
+                            <div class="form-group"><label for="size">Coffee Size</label>
+                                <select id="size" name="size" onchange="previewPrice()">
+                                    <option value="">Select size</option>
+                                    <option>Small</option>
+                                    <option>Medium</option>
+                                    <option>Large</option>
+                                </select>
+                                <span class="error" id="sizeError"></span>
+                            </div>
+                            <div class="form-group"><label for="milk">Milk Type</label>
+                                <select id="milk" name="milk" onchange="previewPrice()">
+                                    <option>Regular Milk</option>
+                                    <option>Skimmed Milk</option>
+                                    <option>Oat Milk</option>
+                                    <option>No Milk</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label for="sugar">Sugar Level</label>
+                                <select id="sugar" name="sugar">
+                                    <option>No Sugar</option>
+                                    <option>Low Sugar</option>
+                                    <option selected>Normal Sugar</option>
+                                    <option>Extra Sugar</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label for="quantity">Quantity</label>
+                                <input type="number" id="quantity" name="quantity" min="1" max="20" value="1"
+                                    onchange="previewPrice()" onkeyup="previewPrice()">
+                                <span class="error" id="quantityError"></span>
+                            </div>
+                        </div>
+                        <div class="result-box" id="pricePreview">Choose a coffee and a size to see the price.</div>
+                        <button class="btn" type="submit">Add Customized Coffee</button>
+                    </form>
+                    <p class="hint">Small: -&#2547;20, Large: +&#2547;40. Skimmed milk +&#2547;10, oat milk +&#2547;30.
+                    </p>
+                </div>
+
+                <div class="col card">
+                    <h3>My cart</h3>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Options</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartBody"></tbody>
+                        </table>
+                    </div>
+                    <form action="#" method="post" novalidate onsubmit="return placeOrder()">
+                        <div class="form-grid">
+                            <div class="form-group"><label for="orderType">Order Type</label>
+                                <select id="orderType">
+                                    <option>Dine In</option>
+                                    <option>Take Away</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label for="orderNote">Special Request</label>
+                                <input type="text" id="orderNote" maxlength="80" placeholder="Optional, e.g. extra hot">
+                                <span class="error" id="orderNoteError"></span>
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-success" type="submit">Place Order</button>
+                            <button class="btn btn-secondary" type="button" onclick="clearCart()">Empty Cart</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ MY ORDERS: Read, Search, Update, Delete ============ -->
+        <section id="history" class="home-section">
+            <div class="section-heading">
+                <h2>Order History & Spending Summary</h2>
+                <p>Previous orders and payment details. Only unpaid, pending orders can be edited or cancelled.</p>
+            </div>
+            <div class="card">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-number" id="statOrders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Spending</div>
+                        <div class="stat-number" id="statSpending">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Favorite Drink</div>
+                        <div class="stat-number" id="statDrink">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Last Order</div>
+                        <div class="stat-number" id="statLast">-</div>
+                    </div>
+                </div>
+
+                <div id="editBox" class="result-box" style="display:none">
+                    <form action="#" method="post" novalidate onsubmit="return saveOrderEdit()">
+                        <strong id="editTitle">Edit order</strong>
+                        <div class="form-grid">
+                            <div class="form-group"><label for="editType">Order Type</label>
+                                <select id="editType">
+                                    <option>Dine In</option>
+                                    <option>Take Away</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label for="editNote">Special Request</label>
+                                <input type="text" id="editNote" maxlength="80">
+                                <span class="error" id="editNoteError"></span>
+                            </div>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn" type="submit">Save Changes</button>
+                            <button class="btn btn-secondary" type="button" onclick="cancelEdit()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="search-row">
+                    <input type="search" id="orderSearch" placeholder="Search by order id, token or item..."
+                        onkeyup="renderOrders()">
+                    <select id="orderStatusFilter" onchange="renderOrders()">
+                        <option value="All">Any status</option>
+                        <option>Pending</option>
+                        <option>Preparing</option>
+                        <option>Ready</option>
+                        <option>Completed</option>
+                    </select>
+                </div>
+                <p class="result-count" id="orderCount"></p>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Token</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ FAVORITE ITEMS ============ -->
+        <section id="favorites" class="home-section">
+            <div class="section-heading">
+                <h2>Favorite Items</h2>
+                <p>Your saved coffee choices.</p>
+            </div>
+            <div class="card">
+                <div id="favMessage" class="message" role="alert"></div>
+                <form action="#" method="post" novalidate onsubmit="return addFavorite()">
+                    <div class="form-grid">
+                        <div class="form-group"><label for="favoriteItem">Menu Item</label>
+                            <select id="favoriteItem" name="menu_item_id"></select>
+                            <span class="error" id="favoriteItemError"></span>
+                        </div>
+                    </div>
+                    <button class="btn" type="submit">Add to Favorites</button>
+                </form>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Favorite Item</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="favBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ ORDER TOKEN ============ -->
+        <section id="token" class="home-section">
+            <div class="section-heading">
+                <h2>Order Token & Waiting Time</h2>
+                <p>Search your order using the token number.</p>
+            </div>
+            <div class="card">
+                <form action="#" method="get" novalidate onsubmit="return findToken()">
+                    <div class="form-grid">
+                        <div class="form-group"><label for="tokenNo">Order Token</label>
+                            <input type="text" id="tokenNo" name="token" placeholder="e.g. CF-1025">
+                            <span class="error" id="tokenNoError"></span>
+                        </div>
+                    </div>
+                    <button class="btn" type="submit">Search Token</button>
+                </form>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Token</th>
+                                <th>Order Date</th>
+                                <th>Order Status</th>
+                                <th>Orders Ahead</th>
+                                <th>Estimated Wait</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tokenBody">
+                            <tr class="empty-row">
+                                <td colspan="5">Type a token and press Search Token.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ LEAVE A REVIEW ============ -->
+        <section id="review" class="home-section">
+            <div class="section-heading">
+                <h2>Leave a Review</h2>
+                <p>Tell us about your visit. The administrator can reply.</p>
+            </div>
+            <div class="card">
+                <div id="reviewMessage" class="message" role="alert"></div>
+                <form action="#" method="post" novalidate onsubmit="return saveReview()">
+                    <div class="form-grid">
+                        <div class="form-group"><label for="reviewRating">Rating</label>
+                            <select id="reviewRating">
+                                <option value="">Select rating</option>
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Good</option>
+                                <option value="3">3 - Okay</option>
+                                <option value="2">2 - Poor</option>
+                                <option value="1">1 - Bad</option>
+                            </select>
+                            <span class="error" id="reviewRatingError"></span>
+                        </div>
+                        <div class="form-group"><label for="reviewText">Your review</label>
+                            <textarea id="reviewText" maxlength="200" placeholder="At least 10 characters"
+                                onkeyup="countReview()"></textarea>
+                            <span class="hint" id="reviewCounter">0 / 200</span>
+                            <span class="error" id="reviewTextError"></span>
+                        </div>
+                    </div>
+                    <button class="btn" type="submit">Submit Review</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <!-- ============ FOOTER ============ -->
+    <footer class="footer">
+        &copy; 2026 Coffee Corner &middot; Coffee Shop Management System
+    </footer>
+    <script src="js/data.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/customer.js"></script>
+</body>
+
+</html>
